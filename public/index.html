@@ -123,7 +123,7 @@
         <div id="sidebar">
             <div class="sidebar-top">
                 <span id="my-name">Contacts</span>
-                <button onclick="location.reload()" style="background:transparent; border:1px solid #ff4081; color:#ff4081; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:12px;">Logout</button>
+                <button onclick="logout()" style="background:transparent; border:1px solid #ff4081; color:#ff4081; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:12px;">Logout</button>
             </div>
             <ul id="user-list"></ul>
         </div>
@@ -167,8 +167,9 @@
     <script>
         const socket = io();
         let myName = '';
-        let targetSocketId = null;
+        let targetUsername = null; // ab hum socketId ki jagah username se chat history save karenge
         let histories = {};
+        let usersMapGlobal = {};
         let isRecording = false;
         let mediaRecorder;
         let audioChunks = [];
@@ -191,6 +192,15 @@
         const backBtn = document.getElementById('back-btn');
         const callOverlay = document.getElementById('call-overlay');
 
+        // Check if already logged in stored in localStorage
+        window.onload = () => {
+            const savedUser = localStorage.getItem('one_messenger_user');
+            if (savedUser) {
+                myName = savedUser;
+                usernameInput.value = myName;
+            }
+        };
+
         authForm.addEventListener('submit', (e) => {
             e.preventDefault();
             myName = usernameInput.value.trim();
@@ -198,25 +208,50 @@
 
             socket.emit('register', { username: myName, password }, (res) => {
                 if (res.success) {
+                    localStorage.setItem('one_messenger_user', myName);
                     authScreen.style.display = 'none';
                     appScreen.style.display = 'flex';
                     document.getElementById('my-name').textContent = myName;
+                    loadLocalHistories();
                 } else {
                     alert(res.message);
                 }
             });
         });
 
+        function logout() {
+            localStorage.removeItem('one_messenger_user');
+            location.reload();
+        }
+
+        function loadLocalHistories() {
+            const savedHistories = localStorage.getItem(`chat_histories_${myName}`);
+            if (savedHistories) {
+                try {
+                    histories = JSON.parse(savedHistories);
+                } catch(e) {
+                    histories = {};
+                }
+            }
+        }
+
+        function saveLocalHistories() {
+            if (!myName) return;
+            localStorage.setItem(`chat_histories_${myName}`, JSON.stringify(histories));
+        }
+
         socket.on('update_users', (usersMap) => {
+            usersMapGlobal = usersMap;
             userList.innerHTML = '';
             for (let sId in usersMap) {
-                if (usersMap[sId] === myName) continue;
+                const uName = usersMap[sId];
+                if (uName === myName) continue;
                 const li = document.createElement('li');
                 li.className = 'contact';
-                li.innerHTML = `💕 <span>${usersMap[sId]}</span>`;
+                li.innerHTML = `💕 <span>${uName}</span>`;
                 li.onclick = () => {
-                    targetSocketId = sId;
-                    chatTitle.textContent = usersMap[sId];
+                    targetUsername = uName;
+                    chatTitle.textContent = uName;
                     noChat.style.display = 'none';
                     activeChat.style.display = 'flex';
                     if (window.innerWidth <= 768) {
@@ -229,17 +264,24 @@
             }
         });
 
+        function getTargetSocketId() {
+            for (let sId in usersMapGlobal) {
+                if (usersMapGlobal[sId] === targetUsername) return sId;
+            }
+            return null;
+        }
+
         function goBack() {
             sidebar.classList.remove('hidden');
             activeChat.style.display = 'none';
             noChat.style.display = 'flex';
-            targetSocketId = null;
+            targetUsername = null;
         }
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             const txt = input.value.trim();
-            if (txt && targetSocketId) {
+            if (txt && targetUsername) {
                 appendAndSend({ type: 'text', content: txt });
                 input.value = '';
             }
@@ -250,25 +292,31 @@
             msgObj.sender = myName;
             msgObj.time = time;
 
-            if (!histories[targetSocketId]) histories[targetSocketId] = [];
-            histories[targetSocketId].push(msgObj);
+            if (!histories[targetUsername]) histories[targetUsername] = [];
+            histories[targetUsername].push(msgObj);
+            saveLocalHistories();
 
-            socket.emit('private_message', { toSocketId: targetSocketId, messageObj: msgObj });
+            const tSocketId = getTargetSocketId();
+            if (tSocketId) {
+                socket.emit('private_message', { toSocketId: tSocketId, messageObj: msgObj });
+            }
             renderMsgs();
         }
 
         socket.on('private_message', ({ messageObj, fromSocketId }) => {
-            if (!histories[fromSocketId]) histories[fromSocketId] = [];
-            histories[fromSocketId].push(messageObj);
+            const senderName = usersMapGlobal[fromSocketId] || 'Unknown';
+            if (!histories[senderName]) histories[senderName] = [];
+            histories[senderName].push(messageObj);
+            saveLocalHistories();
 
-            if (targetSocketId === fromSocketId) {
+            if (targetUsername === senderName) {
                 renderMsgs();
             }
         });
 
         function sendFile(inputElement, type) {
             const file = inputElement.files[0];
-            if (!file || !targetSocketId) return;
+            if (!file || !targetUsername) return;
 
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -287,7 +335,7 @@
 
         // Voice note recording
         async function toggleVoiceRecord() {
-            if (!targetSocketId) { alert('Pehle contact select karein!'); return; }
+            if (!targetUsername) { alert('Pehle contact select karein!'); return; }
             if (!isRecording) {
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -312,9 +360,10 @@
 
         // Call Features & Signaling
         function triggerCall(type) {
-            if (!targetSocketId) return;
-            incomingCallerId = targetSocketId;
-            socket.emit('call_user', { toSocketId: targetSocketId, callType: type, callerName: myName });
+            const tSocketId = getTargetSocketId();
+            if (!tSocketId) { alert('User offline lag raha hai!'); return; }
+            incomingCallerId = tSocketId;
+            socket.emit('call_user', { toSocketId: tSocketId, callType: type, callerName: myName });
             document.getElementById('caller-name').textContent = chatTitle.textContent;
             document.getElementById('call-status-text').textContent = `Calling with Love (${type.toUpperCase()})...`;
             document.getElementById('active-call-actions').innerHTML = `<button class="call-action-btn reject-call" onclick="endCallOverlay()">❌</button>`;
@@ -340,6 +389,7 @@
 
         socket.on('call_accepted', () => {
             document.getElementById('call-status-text').textContent = `Call Connected ❤️`;
+            document.getElementById('active-call-actions').history = true;
             document.getElementById('active-call-actions').innerHTML = `<button class="call-action-btn reject-call" onclick="endCallOverlay()">❌</button>`;
         });
 
@@ -358,8 +408,8 @@
 
         function renderMsgs() {
             messages.innerHTML = '';
-            if (!targetSocketId || !histories[targetSocketId]) return;
-            histories[targetSocketId].forEach(m => {
+            if (!targetUsername || !histories[targetUsername]) return;
+            histories[targetUsername].forEach(m => {
                 const li = document.createElement('li');
                 li.className = m.sender === myName ? 'msg outgoing' : 'msg incoming';
                 li.innerHTML = `${m.content}<span>${m.time}</span>`;
