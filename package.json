@@ -1,13 +1,14 @@
 {
-  "name": "pk-chat-app",
-  "version": "2.2.0",
-  "main": "index.js",
+  "name": "one-messenger",
+  "version": "1.0.0",
+  "description": "ONE Messenger - Romantic Chat App",
+  "main": "server.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
-    "socket.io": "^4.7.5"
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2",
+    "peer": "^1.0.2"
   }
 }
-
