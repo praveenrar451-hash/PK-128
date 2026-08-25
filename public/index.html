@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Chat Web</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 10px; }
+        #chat-container { max-width: 500px; margin: auto; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        #messages { list-style-type: none; padding: 0; height: 350px; overflow-y: scroll; border: 1px solid #ddd; margin-bottom: 10px; padding: 10px; background: #fafafa; }
+        #messages li { padding: 8px 12px; margin-bottom: 8px; background: #e1ffc7; border-radius: 6px; width: fit-content; word-break: break-all; }
+        #form { display: flex; gap: 5px; flex-wrap: wrap; }
+        #username { width: 30%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        #input { flex-grow: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        button { padding: 10px 15px; background: #0084ff; color: white; border: none; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div id="chat-container">
+        <h2>Live Chat (Incognito Supported)</h2>
+        <ul id="messages"></ul>
+        <form id="form">
+            <input id="username" placeholder="Username" required />
+            <input id="input" autocomplete="off" placeholder="Type message..." required />
+            <button>Send Message</button>
+        </form>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        const form = document.getElementById('form');
+        const input = document.getElementById('input');
+        const usernameInput = document.getElementById('username');
+        const messages = document.getElementById('messages');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (input.value && usernameInput.value) {
+                const messageData = {
+                    user: usernameInput.value,
+                    text: input.value
+                };
+                socket.emit('chat_message', messageData);
+                input.value = '';
+            }
+        });
+
+        socket.on('chat_message', (data) => {
+            const item = document.createElement('li');
+            item.textContent = `${data.user}: ${data.text}`;
+            messages.appendChild(item);
+            messages.scrollTop = messages.scrollHeight;
+        });
+    </script>
+</body>
+</html>
