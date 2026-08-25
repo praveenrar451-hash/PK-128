@@ -1,7 +1,6 @@
 {
   "name": "pk-chat-app",
-  "version": "2.0.0",
-  "description": "Advanced real-time chat and call app",
+  "version": "2.1.0",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
