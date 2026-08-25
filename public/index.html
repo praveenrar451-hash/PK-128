@@ -222,15 +222,17 @@
             });
         }
 
-        function getTimeStamp() {
+                function getTimeStamp() {
             const d = new Date();
-            let hours = d.getHours();
-            let minutes = d.getMinutes();
-            const ampm = hours >= 12 ? 'PM' : 'AM';
-            hours = hours % 12 || 12;
-            minutes = minutes < 10 ? '0' + minutes : minutes;
-            return `${hours}:${minutes} ${ampm}`;
+            const options = {
+                timeZone: 'Asia/Kolkata',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            };
+            return d.toLocaleTimeString('en-US', options);
         }
+
 
         socket.on('contacts_update', (data) => {
             contactsData = data;
