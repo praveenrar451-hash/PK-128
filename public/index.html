@@ -6,47 +6,51 @@
     <title>ONE Messenger</title>
     <style>
         * { box-sizing: border-box; }
-        body, html { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 0; height: 100%; overflow: hidden; }
+        body, html { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #1f1b24; color: #f3e5f5; margin: 0; padding: 0; height: 100%; overflow: hidden; }
         
-        /* Login Screen */
-        #auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #008069; display: flex; justify-content: center; align-items: center; z-index: 100; }
-        .auth-box { background: white; padding: 30px; border-radius: 8px; width: 300px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .auth-box h2 { color: #008069; margin-bottom: 20px; }
-        .auth-box input { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; }
-        .auth-box button { width: 100%; padding: 10px; background: #008069; border: none; color: white; font-weight: bold; border-radius: 4px; cursor: pointer; }
+        /* Login Screen (Romantic Vibe) */
+        #auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #4a1525, #2d1b36); display: flex; justify-content: center; align-items: center; z-index: 100; }
+        .auth-box { background: rgba(35, 20, 40, 0.95); padding: 35px; border-radius: 16px; width: 320px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(233, 30, 99, 0.3); }
+        .auth-box h2 { color: #ff4081; margin-bottom: 25px; font-size: 26px; letter-spacing: 1px; }
+        .auth-box input { width: 100%; padding: 12px 15px; margin-bottom: 15px; background: #2a1b30; border: 1px solid #5d3a6e; border-radius: 8px; color: white; font-size: 15px; outline: none; }
+        .auth-box input:focus { border-color: #ff4081; }
+        .auth-box button { width: 100%; padding: 12px; background: linear-gradient(135deg, #ff4081, #c51162); border: none; color: white; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 16px; transition: 0.2s; }
+        .auth-box button:hover { opacity: 0.9; }
 
         /* App Screen */
         #app-screen { display: none; width: 100vw; height: 100vh; flex-direction: row; overflow: hidden; }
         
-        /* Sidebar */
-        #sidebar { width: 300px; background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column; height: 100%; }
-        .sidebar-top { padding: 15px; background: #f0f2f5; font-weight: bold; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        /* Sidebar (Romantic Dark Theme) */
+        #sidebar { width: 300px; background: #23192f; border-right: 1px solid #3d2a4f; display: flex; flex-direction: column; height: 100%; }
+        .sidebar-top { padding: 15px 20px; background: #2a1b3a; font-weight: bold; border-bottom: 1px solid #3d2a4f; display: flex; justify-content: space-between; align-items: center; color: #ff80ab; flex-shrink: 0; }
         #user-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; flex: 1; }
-        .contact { padding: 15px; border-bottom: 1px solid #f0f2f5; cursor: pointer; font-size: 15px; }
-        .contact:hover, .contact.active { background: #f5f6f6; }
+        .contact { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.03); cursor: pointer; font-size: 15px; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+        .contact:hover, .contact.active { background: #322142; color: #ff4081; }
 
         /* Chat Area */
-        #chat-area { flex: 1; display: flex; flex-direction: column; height: 100%; background: #efeae2; overflow: hidden; position: relative; }
+        #chat-area { flex: 1; display: flex; flex-direction: column; height: 100%; background: #181020; overflow: hidden; position: relative; }
         
         /* Fixed Header */
-        .chat-header { padding: 15px; background: #f0f2f5; border-bottom: 1px solid #ddd; font-weight: bold; font-size: 16px; flex-shrink: 0; display: flex; align-items: center; }
+        .chat-header { padding: 15px 20px; background: #23192f; border-bottom: 1px solid #3d2a4f; font-weight: bold; font-size: 16px; flex-shrink: 0; display: flex; align-items: center; color: #f3e5f5; }
         
-        #no-chat { flex: 1; display: flex; justify-content: center; align-items: center; color: #666; font-size: 16px; }
+        #no-chat { flex: 1; display: flex; justify-content: center; align-items: center; color: #9c88b1; font-size: 16px; text-align: center; padding: 20px; }
         
         #active-chat { display: none; flex: 1; flex-direction: column; height: 100%; overflow: hidden; }
         
-        /* Scrollable Messages Container Only */
-        #messages { flex: 1; padding: 15px; overflow-y: auto; list-style: none; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+        /* Scrollable Messages Area */
+        #messages { flex: 1; padding: 20px; overflow-y: auto; list-style: none; margin: 0; display: flex; flex-direction: column; gap: 12px; }
         
-        .msg { max-width: 60%; padding: 10px; border-radius: 6px; font-size: 14px; word-break: break-all; }
-        .msg.incoming { background: white; align-self: flex-start; }
-        .msg.outgoing { background: #d9fdd3; align-self: flex-end; }
-        .msg span { display: block; font-size: 10px; color: #777; margin-top: 4px; text-align: right; }
+        .msg { max-width: 65%; padding: 10px 14px; border-radius: 12px; font-size: 14px; line-height: 1.4; word-break: break-all; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .msg.incoming { background: #2a1b3a; color: #f3e5f5; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .msg.outgoing { background: linear-gradient(135deg, #c51162, #880e4f); color: #ffffff; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .msg span { display: block; font-size: 10px; color: rgba(255,255,255,0.6); margin-top: 4px; text-align: right; }
 
         /* Fixed Bottom Input Form */
-        #form { padding: 10px 15px; background: #f0f2f5; display: flex; gap: 10px; border-top: 1px solid #ddd; flex-shrink: 0; }
-        #input { flex: 1; padding: 12px; border: none; border-radius: 4px; outline: none; font-size: 14px; background: white; }
-        #form button { padding: 10px 20px; background: #008069; border: none; color: white; font-weight: bold; border-radius: 4px; cursor: pointer; }
+        #form { padding: 12px 20px; background: #23192f; display: flex; gap: 12px; border-top: 1px solid #3d2a4f; flex-shrink: 0; }
+        #input { flex: 1; padding: 12px 16px; border: 1px solid #3d2a4f; border-radius: 24px; outline: none; font-size: 14px; background: #1a1024; color: white; }
+        #input:focus { border-color: #ff4081; }
+        #form button { padding: 0 22px; background: #ff4081; border: none; color: white; font-weight: bold; border-radius: 24px; cursor: pointer; font-size: 14px; transition: 0.2s; }
+        #form button:hover { background: #e91e63; }
 
         @media(max-width: 768px) {
             #sidebar { width: 100%; position: absolute; height: 100%; z-index: 10; }
@@ -60,9 +64,9 @@
     <!-- Login -->
     <div id="auth-screen">
         <div class="auth-box">
-            <h2>PK Messenger</h2>
+            <h2>ONE Messenger</h2>
             <form id="auth-form">
-                <input type="text" id="username" placeholder="USERNAME" required autocomplete="off" />
+                <input type="text" id="username" placeholder="Username" required autocomplete="off" />
                 <input type="password" id="password" placeholder="Password" required />
                 <button type="submit">Login</button>
             </form>
@@ -74,28 +78,28 @@
         <div id="sidebar">
             <div class="sidebar-top">
                 <span id="my-name">Contacts</span>
-                <button onclick="location.reload()" style="background:#ff4d4d; border:none; color:white; padding:5px 10px; border-radius:3px; cursor:pointer;">Logout</button>
+                <button onclick="location.reload()" style="background:transparent; border:1px solid #ff4081; color:#ff4081; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:12px;">Logout</button>
             </div>
             <ul id="user-list"></ul>
         </div>
 
         <div id="chat-area">
             <div id="no-chat">
-                <p>Contacts in left side</p>
+                <p>💖 Left side se contact select karke baatein shuru karein...</p>
             </div>
 
             <div id="active-chat">
                 <div class="chat-header">
-                    <button id="back-btn" onclick="goBack()" style="display:none; margin-right:10px; background:none; border:none; font-size:18px; cursor:pointer;">⬅️</button>
+                    <button id="back-btn" onclick="goBack()" style="display:none; margin-right:12px; background:none; border:none; color:white; font-size:18px; cursor:pointer;">⬅️</button>
                     <span id="chat-title">Chat</span>
                 </div>
                 
-                <!-- Sirf yeh area scroll hoga -->
+                <!-- Scrollable Messages -->
                 <ul id="messages"></ul>
 
                 <!-- Fixed Input Form -->
                 <form id="form">
-                    <input id="input" autocomplete="off" placeholder="type a massage..." required />
+                    <input id="input" autocomplete="off" placeholder="Type a message..." required />
                     <button type="submit">SEND</button>
                 </form>
             </div>
@@ -134,7 +138,7 @@
                 if (res.success) {
                     authScreen.style.display = 'none';
                     appScreen.style.display = 'flex';
-                    document.getElementById('my-name').textContent = `Hi, ${myName}`;
+                    document.getElementById('my-name').textContent = myName;
                 } else {
                     alert(res.message);
                 }
@@ -147,7 +151,7 @@
                 if (usersMap[sId] === myName) continue;
                 const li = document.createElement('li');
                 li.className = 'contact';
-                li.textContent = `🟢 ${usersMap[sId]}`;
+                li.innerHTML = `💕 <span>${usersMap[sId]}</span>`;
                 li.onclick = () => {
                     targetSocketId = sId;
                     chatTitle.textContent = usersMap[sId];
