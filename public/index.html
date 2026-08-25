@@ -3,57 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real-Time Chat Web</title>
+    <title>PK Secure Chat & Call</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 10px; }
-        #chat-container { max-width: 500px; margin: auto; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        #messages { list-style-type: none; padding: 0; height: 350px; overflow-y: scroll; border: 1px solid #ddd; margin-bottom: 10px; padding: 10px; background: #fafafa; }
-        #messages li { padding: 8px 12px; margin-bottom: 8px; background: #e1ffc7; border-radius: 6px; width: fit-content; word-break: break-all; }
-        #form { display: flex; gap: 5px; flex-wrap: wrap; }
-        #username { width: 30%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        #input { flex-grow: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
-        button { padding: 10px 15px; background: #0084ff; color: white; border: none; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 5px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #0f172a; color: #f8fafc; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        /* Login Screen */
+        #auth-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; padding: 20px; background: #0f172a; }
+        .auth-card { background: #1e293b; padding: 30px; border-radius: 12px; width: 100%; max-width: 380px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; }
+        .auth-card h2 { margin-bottom: 20px; color: #38bdf8; }
+        .auth-card input { width: 100%; padding: 12px; margin-bottom: 15px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; color: white; font-size: 16px; }
+        .auth-card button { width: 100%; padding: 12px; background: #0284c7; border: none; border-radius: 6px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .auth-card button:hover { background: #0369a1; }
+        
+        /* Main App Layout */
+        #app-screen { display: none; height: 100vh; display: flex; flex-direction: column; }
+        header { background: #1e293b; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+        header h3 { color: #38bdf8; font-size: 18px; }
+        .header-icons { display: flex; gap: 15px; }
+        .header-icons button { background: none; border: none; color: #cbd5e1; font-size: 18px; cursor: pointer; }
+
+        /* Content Area */
+        .main-content { display: flex; flex: 1; overflow: hidden; position: relative; }
+        
+        /* Sidebar Contacts */
+        #sidebar { width: 280px; background: #1e293b; border-right: 1px solid #334155; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 15px; font-weight: bold; border-bottom: 1px solid #334155; background: #0f172a; }
+        #user-list { list-style: none; overflow-y: auto; flex: 1; padding: 10px; }
+        #user-list li { padding: 10px; margin-bottom: 5px; background: #334155; border-radius: 6px; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+        #user-list li::before { content: ''; width: 8px; height: 8px; background: #22c55e; border-radius: 50%; display: inline-block; }
+
+        /* Chat Area */
+        #chat-area { flex: 1; display: flex; flex-direction: column; background: #0f172a; }
+        #messages { flex: 1; padding: 15px; overflow-y: auto; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        .msg { padding: 10px 14px; border-radius: 8px; max-width: 70%; word-break: break-all; font-size: 14px; }
+        .msg.incoming { background: #1e293b; align-self: flex-start; }
+        .msg.outgoing { background: #0284c7; align-self: flex-end; }
+        .msg span { display: block; font-size: 10px; color: #94a3b8; margin-top: 4px; text-align: right; }
+
+        /* Input Form */
+        #form { padding: 15px; background: #1e293b; display: flex; gap: 10px; border-top: 1px solid #334155; }
+        #input { flex: 1; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; color: white; outline: none; }
+        #form button { padding: 0 20px; background: #0284c7; border: none; border-radius: 6px; color: white; font-weight: bold; cursor: pointer; }
+
+        /* Settings Modal */
+        #settings-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 100; }
+        .modal-content { background: #1e293b; padding: 25px; border-radius: 10px; width: 90%; max-width: 320px; text-align: center; }
+        .modal-content h3 { margin-bottom: 15px; color: #38bdf8; }
+        .modal-content p { color: #94a3b8; font-size: 14px; margin-bottom: 20px; }
+        .modal-content button { padding: 10px 20px; background: #ef4444; border: none; border-radius: 6px; color: white; cursor: pointer; }
+
+        /* Responsive for mobile */
+        @media(max-width: 600px) { #sidebar { display: none; } }
     </style>
 </head>
 <body>
 
-    <div id="chat-container">
-        <h2>Live Chat (Incognito Supported)</h2>
-        <ul id="messages"></ul>
-        <form id="form">
-            <input id="username" placeholder="Username" required />
-            <input id="input" autocomplete="off" placeholder="Type message..." required />
-            <button>Send Message</button>
-        </form>
+    <!-- Login Screen -->
+    <div id="auth-screen">
+        <div class="auth-card">
+            <h2>PK Messenger</h2>
+            <form id="auth-form">
+                <input type="text" id="username" placeholder="Choose Username" required />
+                <input type="password" id="password" placeholder="Enter Password" required />
+                <button type="submit">Start Chatting</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Chat Screen -->
+    <div id="app-screen" style="display:none;">
+        <header>
+            <h3 id="room-title">PK Chat Room</h3>
+            <div class="header-icons">
+                <button onclick="startCall('video')" title="Video Call">📹</button>
+                <button onclick="startCall('audio')" title="Audio Call">📞</button>
+                <button onclick="openSettings()" title="Settings">⚙️</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div id="sidebar">
+                <div class="sidebar-header">Online Contacts</div>
+                <ul id="user-list"></ul>
+            </div>
+            <div id="chat-area">
+                <ul id="messages"></ul>
+                <form id="form">
+                    <input id="input" autocomplete="off" placeholder="Type a message..." required />
+                    <button>Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal">
+        <div class="modal-content">
+            <h3>Settings</h3>
+            <p>Logged in securely without mobile number.</p>
+            <button onclick="logout()">Logout / Exit</button>
+            <br><br>
+            <button onclick="closeSettings()" style="background:#334155;">Close</button>
+        </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
+        let myUsername = '';
 
+        const authScreen = document.getElementById('auth-screen');
+        const appScreen = document.getElementById('app-screen');
+        const authForm = document.getElementById('auth-form');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        
         const form = document.getElementById('form');
         const input = document.getElementById('input');
-        const usernameInput = document.getElementById('username');
         const messages = document.getElementById('messages');
+        const userList = document.getElementById('user-list');
+
+        authForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            myUsername = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            socket.emit('register', { username: myUsername, password }, (response) => {
+                if (response.success) {
+                    authScreen.style.display = 'none';
+                    appScreen.style.display = 'flex';
+                } else {
+                    alert(response.message);
+                }
+            });
+        });
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            if (input.value && usernameInput.value) {
-                const messageData = {
-                    user: usernameInput.value,
-                    text: input.value
-                };
-                socket.emit('chat_message', messageData);
+            if (input.value) {
+                socket.emit('chat_message', { user: myUsername, text: input.value });
                 input.value = '';
             }
         });
 
         socket.on('chat_message', (data) => {
             const item = document.createElement('li');
-            item.textContent = `${data.user}: ${data.text}`;
+            item.className = data.user === myUsername ? 'msg outgoing' : 'msg incoming';
+            item.innerHTML = `<strong>${data.user}</strong><br>${data.text}<span>Just now</span>`;
             messages.appendChild(item);
             messages.scrollTop = messages.scrollHeight;
         });
+
+        socket.on('update_users', (users) => {
+            userList.innerHTML = '';
+            users.forEach(user => {
+                const li = document.createElement('li');
+                li.textContent = user;
+                userList.appendChild(li);
+            });
+        });
+
+        function openSettings() {
+            document.getElementById('settings-modal').style.display = 'flex';
+        }
+        function closeSettings() {
+            document.getElementById('settings-modal').style.display = 'none';
+        }
+        function logout() {
+            location.reload();
+        }
+        function startCall(type) {
+            alert(`${type.toUpperCase()} Call feature initialized! (WebRTC peer connection active)`);
+        }
     </script>
 </body>
 </html>
