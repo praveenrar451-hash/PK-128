@@ -8,38 +8,64 @@ const io = new Server(server);
 
 app.use(express.static('public'));
 
-const activeUsers = {}; // socket.id -> username
-const FIXED_PASSWORD = "272009";
+const users = {}; // socketId -> username
+const userCredentials = {}; // username -> password
 
 io.on('connection', (socket) => {
+    console.log('User connected:', socket.id);
+
+    // Register & Login handling
     socket.on('register', ({ username, password }, callback) => {
-        if (!username) return callback({ success: false, message: 'Username zaroori hai!' });
-        if (password !== FIXED_PASSWORD) {
-            return callback({ success: false, message: 'Galat Password!' });
+        if (!username || !password) {
+            return callback({ success: false, message: 'Username aur Password zaroori hai!' });
         }
-        
-        // Check if username already taken
-        if (Object.values(activeUsers).includes(username)) {
-            return callback({ success: false, message: 'Yeh username pehle se online hai!' });
+        if (userCredentials[username] && userCredentials[username] !== password) {
+            return callback({ success: false, message: 'Galat Password! Yeh username kisi aur ka hai.' });
         }
 
-        activeUsers[socket.id] = username;
+        userCredentials[username] = password;
+        users[socket.id] = username;
+
+        io.emit('update_users', users);
         callback({ success: true });
-        io.emit('update_users', activeUsers);
     });
 
-    // Private / Personal Messaging between contacts
-    socket.on('private_message', ({ toSocketId, message, sender }) => {
-        io.to(toSocketId).emit('private_message', { sender, message, fromSocketId: socket.id });
+    // Handle Private Messages (Text / HTML / Files)
+    socket.on('private_message', ({ toSocketId, messageObj }) => {
+        if (users[socket.id]) {
+            io.to(toSocketId).emit('private_message', {
+                messageObj,
+                fromSocketId: socket.id
+            });
+        }
     });
 
+    // Call Signaling Events
+    socket.on('call_user', ({ toSocketId, callType, callerName }) => {
+        io.to(toSocketId).emit('incoming_call', {
+            fromSocketId: socket.id,
+            callType,
+            callerName
+        });
+    });
+
+    socket.on('call_answered', ({ toSocketId }) => {
+        io.to(toSocketId).emit('call_accepted');
+    });
+
+    socket.on('reject_call', ({ toSocketId }) => {
+        io.to(toSocketId).emit('call_rejected');
+    });
+
+    // Disconnect handling
     socket.on('disconnect', () => {
-        delete activeUsers[socket.id];
-        io.emit('update_users', activeUsers);
+        delete users[socket.id];
+        io.emit('update_users', users);
+        console.log('User disconnected:', socket.id);
     });
 });
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });
