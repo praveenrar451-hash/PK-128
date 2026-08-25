@@ -8,28 +8,34 @@ const io = new Server(server);
 
 app.use(express.static('public'));
 
-const activeUsers = {};
+const activeUsers = {}; // socket.id -> username
 const FIXED_PASSWORD = "272009";
 
 io.on('connection', (socket) => {
     socket.on('register', ({ username, password }, callback) => {
-        if (!username) return callback({ success: false, message: 'Username daalna zaroori hai!' });
+        if (!username) return callback({ success: false, message: 'Username zaroori hai!' });
         if (password !== FIXED_PASSWORD) {
-            return callback({ success: false, message: 'Galat Password! Sahi password "272009" hai.' });
+            return callback({ success: false, message: 'Galat Password!' });
         }
         
+        // Check if username already taken
+        if (Object.values(activeUsers).includes(username)) {
+            return callback({ success: false, message: 'Yeh username pehle se online hai!' });
+        }
+
         activeUsers[socket.id] = username;
         callback({ success: true });
-        io.emit('update_users', Object.values(activeUsers));
+        io.emit('update_users', activeUsers);
     });
 
-    socket.on('chat_message', (data) => {
-        io.emit('chat_message', data);
+    // Private / Personal Messaging between contacts
+    socket.on('private_message', ({ toSocketId, message, sender }) => {
+        io.to(toSocketId).emit('private_message', { sender, message, fromSocketId: socket.id });
     });
 
     socket.on('disconnect', () => {
         delete activeUsers[socket.id];
-        io.emit('update_users', Object.values(activeUsers));
+        io.emit('update_users', activeUsers);
     });
 });
 
