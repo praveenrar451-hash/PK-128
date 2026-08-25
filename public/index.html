@@ -8,7 +8,7 @@
         * { box-sizing: border-box; }
         body, html { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #1f1b24; color: #f3e5f5; margin: 0; padding: 0; height: 100%; overflow: hidden; }
         
-        /* Login Screen (Romantic Vibe) */
+        /* Login Screen */
         #auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #4a1525, #2d1b36); display: flex; justify-content: center; align-items: center; z-index: 100; }
         .auth-box { background: rgba(35, 20, 40, 0.95); padding: 35px; border-radius: 16px; width: 320px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(233, 30, 99, 0.3); }
         .auth-box h2 { color: #ff4081; margin-bottom: 25px; font-size: 26px; letter-spacing: 1px; }
@@ -112,7 +112,7 @@
         <div class="caller-heart">💖</div>
         <h2 id="call-status-text" style="color: #ff80ab; margin-bottom: 10px;">Incoming Love Call...</h2>
         <p id="caller-name" style="font-size: 22px; font-weight: bold;"></p>
-        <div class="call-actions">
+        <div class="call-actions" id="active-call-actions">
             <button class="call-action-btn accept-call" onclick="answerCall()">📞</button>
             <button class="call-action-btn reject-call" onclick="endCallOverlay()">❌</button>
         </div>
@@ -172,6 +172,7 @@
         let isRecording = false;
         let mediaRecorder;
         let audioChunks = [];
+        let incomingCallerId = null;
 
         const authScreen = document.getElementById('auth-screen');
         const appScreen = document.getElementById('app-screen');
@@ -252,7 +253,7 @@
             if (!histories[targetSocketId]) histories[targetSocketId] = [];
             histories[targetSocketId].push(msgObj);
 
-            socket.emit('private_message', { toSocketId: targetSocketId, messageObj: msgObj, sender: myName });
+            socket.emit('private_message', { toSocketId: targetSocketId, messageObj: msgObj });
             renderMsgs();
         }
 
@@ -284,7 +285,7 @@
             reader.readAsDataURL(file);
         }
 
-        // Voice note recording simulation
+        // Voice note recording
         async function toggleVoiceRecord() {
             if (!targetSocketId) { alert('Pehle contact select karein!'); return; }
             if (!isRecording) {
@@ -300,33 +301,60 @@
                     };
                     mediaRecorder.start();
                     isRecording = true;
-                    event.target.style.color = 'red';
                 } catch(err) {
                     alert('Mic access nahi mila!');
                 }
             } else {
                 mediaRecorder.stop();
                 isRecording = false;
-                event.target.style.color = '#ff80ab';
             }
         }
 
-        // Call Features UI
+        // Call Features & Signaling
         function triggerCall(type) {
             if (!targetSocketId) return;
+            incomingCallerId = targetSocketId;
+            socket.emit('call_user', { toSocketId: targetSocketId, callType: type, callerName: myName });
             document.getElementById('caller-name').textContent = chatTitle.textContent;
             document.getElementById('call-status-text').textContent = `Calling with Love (${type.toUpperCase()})...`;
+            document.getElementById('active-call-actions').innerHTML = `<button class="call-action-btn reject-call" onclick="endCallOverlay()">❌</button>`;
             callOverlay.style.display = 'flex';
         }
 
+        socket.on('incoming_call', ({ fromSocketId, callType, callerName }) => {
+            incomingCallerId = fromSocketId;
+            document.getElementById('caller-name').textContent = callerName;
+            document.getElementById('call-status-text').textContent = `Incoming Love Call (${callType.toUpperCase()})...`;
+            document.getElementById('active-call-actions').innerHTML = `
+                <button class="call-action-btn accept-call" onclick="answerCall()">📞</button>
+                <button class="call-action-btn reject-call" onclick="endCallOverlay()">❌</button>
+            `;
+            callOverlay.style.display = 'flex';
+        });
+
         function answerCall() {
-            alert('Call Connected with Love ❤️');
-            callOverlay.style.display = 'none';
+            socket.emit('call_answered', { toSocketId: incomingCallerId });
+            document.getElementById('call-status-text').textContent = `Call Connected ❤️`;
+            document.getElementById('active-call-actions').innerHTML = `<button class="call-action-btn reject-call" onclick="endCallOverlay()">❌</button>`;
         }
 
+        socket.on('call_accepted', () => {
+            document.getElementById('call-status-text').textContent = `Call Connected ❤️`;
+            document.getElementById('active-call-actions').innerHTML = `<button class="call-action-btn reject-call" onclick="endCallOverlay()">❌</button>`;
+        });
+
         function endCallOverlay() {
+            if (incomingCallerId) {
+                socket.emit('reject_call', { toSocketId: incomingCallerId });
+            }
             callOverlay.style.display = 'none';
+            incomingCallerId = null;
         }
+
+        socket.on('call_rejected', () => {
+            alert('Call Ended / Rejected');
+            callOverlay.style.display = 'none';
+        });
 
         function renderMsgs() {
             messages.innerHTML = '';
