@@ -6,25 +6,23 @@
     <title>PK Classic Messenger</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background: #efeae2; color: #111b21; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        html, body { height: 100%; width: 100%; overflow: hidden; background: #efeae2; }
 
-        /* Classic Login Screen (No Hint) */
+        /* Login Screen */
         #auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #00a884; display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
         .auth-card { background: #ffffff; padding: 35px 25px; border-radius: 12px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
         .auth-card h2 { color: #00a884; margin-bottom: 25px; font-size: 26px; }
         .auth-card input { width: 100%; padding: 14px; margin-bottom: 15px; background: #f0f2f5; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 16px; outline: none; }
-        .auth-card input:focus { border-color: #00a884; }
         .auth-card button { width: 100%; padding: 14px; background: #00a884; border: none; border-radius: 8px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; }
-        .auth-card button:hover { background: #019574; }
 
-        /* Main App Screen (Classic Split Layout for Mobile/Desktop) */
-        #app-screen { display: none; height: 100vh; flex-direction: row; background: #f0f2f5; }
+        /* Main App Screen */
+        #app-screen { display: none; height: 100vh; width: 100vw; flex-direction: row; background: #f0f2f5; position: relative; overflow: hidden; }
         
         /* Left Sidebar: Contacts List */
-        #sidebar { width: 320px; background: #ffffff; border-right: 1px solid #d1d7db; display: flex; flex-direction: column; height: 100%; }
+        #sidebar { width: 320px; background: #ffffff; border-right: 1px solid #d1d7db; display: flex; flex-direction: column; height: 100%; z-index: 10; }
         .sidebar-header { padding: 15px 20px; background: #f0f2f5; border-bottom: 1px solid #d1d7db; font-weight: bold; font-size: 16px; display: flex; justify-content: space-between; align-items: center; color: #41525d; }
         #user-list { list-style: none; overflow-y: auto; flex: 1; }
-        .contact-item { padding: 15px 20px; border-bottom: 1px solid #f0f2f5; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: 0.2s; }
+        .contact-item { padding: 15px 20px; border-bottom: 1px solid #f0f2f5; display: flex; align-items: center; gap: 12px; cursor: pointer; }
         .contact-item:hover, .contact-item.active { background: #f0f2f5; }
         .contact-avatar { width: 42px; height: 42px; background: #00a884; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px; flex-shrink: 0; }
         .contact-info h4 { font-size: 16px; color: #111b21; margin-bottom: 2px; }
@@ -32,38 +30,37 @@
 
         /* Right Area: Chat Window */
         #chat-window { flex: 1; display: flex; flex-direction: column; height: 100%; background: #efeae2; position: relative; }
-        .chat-header { padding: 12px 20px; background: #f0f2f5; border-bottom: 1px solid #d1d7db; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+        .chat-header { padding: 12px 20px; background: #f0f2f5; border-bottom: 1px solid #d1d7db; display: flex; align-items: center; justify-content: space-between; height: 60px; flex-shrink: 0; }
         .chat-header-info { display: flex; align-items: center; gap: 12px; }
         .chat-header-info h3 { font-size: 16px; color: #111b21; }
         
         #no-chat-selected { flex: 1; display: flex; justify-content: center; align-items: center; color: #667781; font-size: 16px; text-align: center; padding: 20px; }
         
-        #active-chat-container { display: none; flex: 1; flex-direction: column; height: 100%; }
-        #messages { flex: 1; padding: 20px; overflow-y: auto; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        #active-chat-container { display: none; flex: 1; flex-direction: column; height: 100%; overflow: hidden; }
         
-        .msg { max-width: 65%; padding: 10px 14px; border-radius: 8px; font-size: 14px; line-height: 1.4; word-break: break-all; position: relative; box-shadow: 0 1px 0.5px rgba(0,0,0,0.13); }
+        /* Messages Area */
+        #messages { flex: 1; padding: 15px; overflow-y: auto; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .msg { max-width: 70%; padding: 10px 14px; border-radius: 8px; font-size: 14px; line-height: 1.4; word-break: break-all; box-shadow: 0 1px 0.5px rgba(0,0,0,0.13); }
         .msg.incoming { background: #ffffff; color: #111b21; align-self: flex-start; border-top-left-radius: 0; }
         .msg.outgoing { background: #d9fdd3; color: #111b21; align-self: flex-end; border-top-right-radius: 0; }
         .msg .time { font-size: 10px; color: #667781; float: right; margin-left: 10px; margin-top: 4px; }
 
-        /* Classic Bottom Input Bar */
-        #form { padding: 10px 20px; background: #f0f2f5; display: flex; align-items: center; gap: 12px; border-top: 1px solid #d1d7db; }
+        /* Fixed Bottom Input Bar */
+        #form { padding: 10px 15px; background: #f0f2f5; display: flex; align-items: center; gap: 10px; border-top: 1px solid #d1d7db; flex-shrink: 0; width: 100%; }
         #input { flex: 1; padding: 12px 16px; background: #ffffff; border: none; border-radius: 8px; font-size: 15px; outline: none; color: #111b21; }
         #form button { background: #00a884; border: none; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; font-size: 18px; flex-shrink: 0; }
-        #form button:hover { background: #019574; }
 
-        /* Responsive Mobile View handling */
+        /* Mobile View Rules */
         @media(max-width: 768px) {
-            #app-screen { position: relative; }
-            #sidebar { width: 100%; position: absolute; left: 0; top: 0; z-index: 10; transition: 0.3s; }
+            #sidebar { width: 100%; position: absolute; left: 0; top: 0; transition: transform 0.3s ease; }
             #sidebar.hidden { transform: translateX(-100%); }
-            #chat-window { width: 100%; position: absolute; left: 0; top: 0; height: 100%; z-index: 5; }
+            #chat-window { width: 100%; position: absolute; left: 0; top: 0; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Login Screen (No Hint) -->
+    <!-- Login Screen -->
     <div id="auth-screen">
         <div class="auth-card">
             <h2>PK Messenger</h2>
@@ -78,26 +75,24 @@
     <!-- Main App Screen -->
     <div id="app-screen">
         <!-- Sidebar Contacts -->
-        <div id="sidebar">
+        <div id="sidebar" class="hidden">
             <div class="sidebar-header">
                 <span id="my-profile-name">Contacts</span>
                 <button onclick="location.reload()" style="background:none; border:none; color: #c91c1c; font-size:14px; cursor:pointer; font-weight:bold;">Logout</button>
             </div>
-            <ul id="user-list">
-                <!-- Contacts will load here -->
-            </ul>
+            <ul id="user-list"></ul>
         </div>
 
         <!-- Chat Window -->
         <div id="chat-window">
             <div id="no-chat-selected">
-                <p>💬 Kisi bhi contact par click karein aur personal chat shuru karein.</p>
+                <p>💬 Upar/Side se contact select karke chat shuru karein.</p>
             </div>
 
             <div id="active-chat-container">
                 <div class="chat-header">
                     <div class="chat-header-info">
-                        <button id="back-btn" onclick="backToContacts()" style="display:none; background:none; border:none; font-size:20px; cursor:pointer; margin-right:5px;">⬅️</button>
+                        <button id="back-btn" onclick="backToContacts()" style="background:none; border:none; font-size:20px; cursor:pointer; margin-right:5px;">⬅️</button>
                         <div class="contact-avatar" id="active-avatar">P</div>
                         <h3 id="active-chat-name">Chat Room</h3>
                     </div>
@@ -118,8 +113,6 @@
         const socket = io();
         let myUsername = '';
         let activePeerSocketId = null;
-        let allUsersData = {};
-        // Store messages per user: { socketId: [ {sender, message, time} ] }
         let chatHistories = {};
 
         const authScreen = document.getElementById('auth-screen');
@@ -137,7 +130,6 @@
         const form = document.getElementById('form');
         const input = document.getElementById('input');
         const sidebar = document.getElementById('sidebar');
-        const backBtn = document.getElementById('back-btn');
 
         authForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -148,6 +140,7 @@
                 if (res.success) {
                     authScreen.style.display = 'none';
                     appScreen.style.display = 'flex';
+                    sidebar.classList.remove('hidden'); // Show contacts on login for mobile
                     document.getElementById('my-profile-name').textContent = `Aap: ${myUsername}`;
                 } else {
                     alert(res.message);
@@ -155,13 +148,10 @@
             });
         });
 
-        // Update contacts list when someone joins or leaves
         socket.on('update_users', (usersMap) => {
-            allUsersData = usersMap;
             userList.innerHTML = '';
-
             for (let sId in usersMap) {
-                if (usersMap[sId] === myUsername) continue; // Don't show self
+                if (usersMap[sId] === myUsername) continue;
 
                 const li = document.createElement('li');
                 li.className = `contact-item ${activePeerSocketId === sId ? 'active' : ''}`;
@@ -188,7 +178,6 @@
 
             if (window.innerWidth <= 768) {
                 sidebar.classList.add('hidden');
-                backBtn.style.display = 'inline-block';
             }
 
             renderMessages();
@@ -201,14 +190,12 @@
             activePeerSocketId = null;
         }
 
-        // Send Private Message
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             const text = input.value.trim();
             if (text && activePeerSocketId) {
                 const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-                // Save locally
                 if (!chatHistories[activePeerSocketId]) chatHistories[activePeerSocketId] = [];
                 chatHistories[activePeerSocketId].push({ sender: myUsername, message: text, time });
 
@@ -219,18 +206,14 @@
             }
         });
 
-        // Receive Private Message
         socket.on('private_message', ({ sender, message, fromSocketId }) => {
             const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
             if (!chatHistories[fromSocketId]) chatHistories[fromSocketId] = [];
             chatHistories[fromSocketId].push({ sender, message, time });
 
-            // If currently chatting with this person, update screen immediately
             if (activePeerSocketId === fromSocketId) {
                 renderMessages();
-            } else {
-                // Optional: alert or notification sound indicator can go here
             }
         });
 
