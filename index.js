@@ -86,6 +86,8 @@ function broadcastContacts() {
                           .map(u => u.charAt(0).toUpperCase() + u.slice(1));
     const onlineList = Array.from(onlineUsers.keys()).map(u => u.charAt(0).toUpperCase() + u.slice(1));
     
+    console.log("Broadcasting contacts -> All:", allUsers, "Online:", onlineList);
+
     io.emit('contacts_update', {
         contacts: allUsers,
         online: onlineList,
