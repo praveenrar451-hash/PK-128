@@ -179,6 +179,9 @@
             document.getElementById('my-profile').innerText = 'ONE: ' + currentUser;
             document.getElementById('login-modal').style.display = 'none';
 
+            // Turant socket se register karein taaki contact list mein naam turant show ho jaye
+            socket.emit('register_user', { username: currentUser, time: getTimeStamp() });
+
             // PeerJS connection setup for Incognito/Normal support
             peer = new Peer(currentUser.toLowerCase().replace(/[^a-z0-9]/g, ''), {
                 host: window.location.hostname,
@@ -188,7 +191,7 @@
             });
 
             peer.on('open', (id) => {
-                socket.emit('register_user', { username: currentUser, time: getTimeStamp() });
+                console.log('Peer connected with ID:', id);
             });
 
             peer.on('call', async (call) => {
