@@ -1,6 +1,6 @@
 {
   "name": "pk-chat-app",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -10,3 +10,4 @@
     "socket.io": "^4.7.5"
   }
 }
+
