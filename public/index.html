@@ -37,18 +37,14 @@
         
         .chat-header { height: 60px; padding: 0 16px; background: #23192f; border-bottom: 1px solid #3d2a4f; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; z-index: 100; }
         .header-left { display: flex; align-items: center; gap: 10px; }
-        .back-btn { background: none; border: none; color: #ff80ab; font-size: 1.4rem; padding: 4px 8px; cursor: pointer; display: none; }
+        .back-btn { background: none; border: none; color: #ff80ab; font-size: 1.4rem; padding: 4px 8px; cursor: pointer; display: none; z-index: 10; }
         .user-title { font-weight: 600; font-size: 1.1rem; color: #f3e5f5; }
         .status { font-size: 0.75rem; color: #9c88b1; }
         
-        .header-right-group { display: flex; align-items: center; gap: 10px; }
-        .call-btn-group { display: flex; gap: 8px; }
-        .call-btn { background: #2f1f3d; border: none; color: #ff80ab; width: 38px; height: 38px; border-radius: 50%; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .call-btn:hover { background: #ff4081; color: white; }
-        
-        /* Theme Toggle Button */
-        .theme-btn { background: #2f1f3d; border: none; color: #ff80ab; width: 38px; height: 38px; border-radius: 50%; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .theme-btn:hover { background: #ff4081; color: white; }
+        .header-right-group { display: flex; align-items: center; gap: 8px; }
+        .call-btn-group { display: flex; gap: 6px; }
+        .call-btn, .mini-game-btn, .theme-btn { background: #2f1f3d; border: none; color: #ff80ab; width: 36px; height: 36px; border-radius: 50%; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .call-btn:hover, .mini-game-btn:hover, .theme-btn:hover { background: #ff4081; color: white; }
 
         /* Messages */
         #message-container { flex: 1; padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; gap: 12px; }
@@ -59,6 +55,15 @@
         .message audio { max-width: 100%; margin-top: 4px; }
         .message .meta { font-size: 0.65rem; color: rgba(255,255,255,0.6); margin-top: 4px; text-align: right; }
         .msg-reaction { position: absolute; bottom: -8px; right: 10px; background: #23192f; border: 1px solid #ff4081; border-radius: 10px; padding: 2px 6px; font-size: 0.75rem; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+
+        /* Mini-Game Modal Popup */
+        #game-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 6000; display: none; justify-content: center; align-items: center; }
+        .game-card { background: #23192f; border: 2px solid #ff4081; padding: 25px; border-radius: 16px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .game-card h3 { color: #ff4081; margin-bottom: 15px; }
+        .game-question { font-size: 1.1rem; margin-bottom: 20px; color: #fff; line-height: 1.4; }
+        .game-btns { display: flex; gap: 10px; justify-content: center; }
+        .game-btn { padding: 8px 16px; background: #ff4081; border: none; color: white; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .game-close { background: #3d2a4f; }
 
         /* Input Bar */
         .chat-input-container { height: 65px; padding: 0 12px; background: #23192f; display: flex; gap: 8px; align-items: center; border-top: 1px solid #3d2a4f; flex-shrink: 0; z-index: 100; }
@@ -111,6 +116,18 @@
         </div>
     </div>
 
+    <!-- Mini Game Modal -->
+    <div id="game-modal">
+        <div class="game-card">
+            <h3>💌 Couple Truth or Dare</h3>
+            <div class="game-question" id="game-q-text">Tap below to get a romantic question!</div>
+            <div class="game-btns">
+                <button class="game-btn" onclick="nextGameQuestion()">New Question</button>
+                <button class="game-btn game-close" onclick="closeGameModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
     <div id="app-container">
         <div id="sidebar">
             <div class="sidebar-header"><span id="my-profile">ONE Messenger</span></div>
@@ -127,6 +144,7 @@
                     </div>
                 </div>
                 <div class="header-right-group">
+                    <button class="mini-game-btn" onclick="openGameModal()" title="Couple Mini-Game">🎮</button>
                     <button class="theme-btn" onclick="toggleTheme()" title="Change Wallpaper Theme">🎨</button>
                     <div class="call-btn-group" id="call-tools" style="display: none;">
                         <button class="call-btn" onclick="initiateCall(false)" title="Audio Call">📞</button>
@@ -189,6 +207,43 @@
         function toggleTheme() {
             currentThemeIndex = (currentThemeIndex + 1) % themes.length;
             document.body.className = themes[currentThemeIndex];
+        }
+
+        // Couple Mini-Game (Truth or Dare questions)
+        const coupleQuestions = [
+            "Phli baar aapne mujhe kab notice kiya tha? 💕",
+            "Agar hume abhi kahin long drive par jana ho, toh kahan chalenge? 🚗",
+            "Meri aisi konsi baat hai jo aapko sabse zyada pasand hai? 🥰",
+            "Apni life ka sabse romantic moment mere sath konsa lagta hai? ✨",
+            "Mujhe ek word mein describe karein! 💖",
+            "Agar hume ek din ke liye time travel karne mile, toh kahan jaenge? ⏳"
+        ];
+
+        function openGameModal() {
+            if (!currentChatUser) return alert('Pehle kisi contact ko select karein!');
+            document.getElementById('game-modal').style.display = 'flex';
+            nextGameQuestion();
+        }
+
+        function closeGameModal() {
+            document.getElementById('game-modal').style.display = 'none';
+        }
+
+        function nextGameQuestion() {
+            const randomIndex = Math.floor(Math.random() * coupleQuestions.length);
+            const question = coupleQuestions[randomIndex];
+            document.getElementById('game-q-text').innerText = question;
+            
+            // Automatically send this question to chat as a cute message
+            if (currentChatUser) {
+                socket.emit('private_message', { 
+                    sender: currentUser, 
+                    receiver: currentChatUser, 
+                    text: "🎮 Couple Game Question: " + question, 
+                    type: 'text', 
+                    time: getTimeStamp() 
+                });
+            }
         }
 
         function login() {
@@ -398,13 +453,11 @@
             
             div.innerHTML = `${content}${reactionHtml}<div class="meta">${msg.time}${ticks}</div>`;
 
-            // Double Tap to Love Feature (Feature 5)
             let lastTap = 0;
             div.onclick = (e) => {
                 const currentTime = new Date().getTime();
                 const tapLength = currentTime - lastTap;
                 if (tapLength < 300 && tapLength > 0) {
-                    // Double tap detected!
                     let reactionSpan = div.querySelector('.msg-reaction');
                     if (!reactionSpan) {
                         reactionSpan = document.createElement('div');
