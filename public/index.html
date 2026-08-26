@@ -45,6 +45,7 @@
         .call-btn-group { display: flex; gap: 6px; }
         .call-btn, .mini-game-btn { background: #2f1f3d; border: none; color: #ff80ab; width: 36px; height: 36px; border-radius: 50%; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .call-btn:hover, .mini-game-btn:hover { background: #ff4081; color: white; }
+        .mini-game-btn.active-game { background: #ff4081; color: white; box-shadow: 0 0 10px #ff4081; }
 
         /* Messages */
         #message-container { flex: 1; padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; gap: 12px; }
@@ -56,22 +57,6 @@
         .message .meta { font-size: 0.65rem; color: rgba(255,255,255,0.6); margin-top: 4px; text-align: right; }
         .msg-reaction { position: absolute; bottom: -8px; right: 10px; background: #23192f; border: 1px solid #ff4081; border-radius: 10px; padding: 2px 6px; font-size: 0.75rem; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
 
-        /* Interactive Truth & Dare Modal */
-        #game-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 6000; display: none; justify-content: center; align-items: center; }
-        .game-card { background: #23192f; border: 2px solid #ff4081; padding: 25px; border-radius: 16px; width: 90%; max-width: 340px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        .game-card h3 { color: #ff4081; margin-bottom: 15px; font-size: 1.3rem; }
-        .game-desc { font-size: 0.9rem; color: #ff80ab; margin-bottom: 15px; }
-        .game-choice-btns { display: flex; gap: 12px; justify-content: center; margin-bottom: 20px; }
-        .choice-btn { flex: 1; padding: 12px; background: #3d2a4f; border: 1px solid #ff4081; color: white; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: 0.2s; }
-        .choice-btn:hover { background: #ff4081; }
-        
-        .custom-add-box { border-top: 1px solid #3d2a4f; padding-top: 15px; margin-top: 10px; text-align: left; }
-        .custom-add-box label { font-size: 0.8rem; color: #9c88b1; display: block; margin-bottom: 6px; }
-        .custom-input-row { display: flex; gap: 6px; }
-        .custom-input-row input { flex: 1; padding: 8px 10px; background: #1a1024; border: 1px solid #5d3a6e; color: #fff; border-radius: 6px; outline: none; font-size: 0.85rem; }
-        .custom-input-row button { padding: 8px 12px; background: #ff4081; border: none; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
-        .game-close-btn { margin-top: 15px; background: none; border: none; color: #9c88b1; cursor: pointer; font-size: 0.9rem; text-decoration: underline; }
-
         /* Input Bar */
         .chat-input-container { height: 65px; padding: 0 12px; background: #23192f; display: flex; gap: 8px; align-items: center; border-top: 1px solid #3d2a4f; flex-shrink: 0; z-index: 100; }
         .chat-input-container input[type="text"] { flex: 1; padding: 10px 16px; background: #1a1024; border: 1px solid #3d2a4f; color: #fff; border-radius: 24px; outline: none; font-size: 0.95rem; }
@@ -79,6 +64,13 @@
         .action-icon { background: none; border: none; font-size: 1.3rem; color: #ff80ab; cursor: pointer; padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         .action-icon.recording { color: #ff1744; animation: pulse 1s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        
+        /* Game Mode Extra Buttons Style (Hidden by default) */
+        .game-mode-btns { display: none; gap: 5px; align-items: center; }
+        .game-mode-btns button { padding: 8px 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 0.85rem; cursor: pointer; color: white; }
+        .btn-truth-mode { background: #2196f3; }
+        .btn-dare-mode { background: #e91e63; }
+
         .send-btn { width: 44px; height: 44px; background: #ff4081; border: none; color: #fff; border-radius: 50%; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: 0.2s; }
         .send-btn:hover { background: #e91e63; }
 
@@ -118,29 +110,6 @@
         </div>
     </div>
 
-    <!-- Interactive Truth & Dare Modal -->
-    <div id="game-modal">
-        <div class="game-card">
-            <h3>🎯 Truth or Dare Game</h3>
-            <div class="game-desc">Apni pasand chunein ya apna naya question add karein!</div>
-            
-            <div class="game-choice-btns">
-                <button class="choice-btn" onclick="playGame('Truth')">Truth 💬</button>
-                <button class="choice-btn" onclick="playGame('Dare')">Dare 🔥</button>
-            </div>
-
-            <div class="custom-add-box">
-                <label>Apna khud ka question add karein:</label>
-                <div class="custom-input-row">
-                    <input type="text" id="custom-q-input" placeholder="Jaise: Tumhe kya pasand hai?">
-                    <button onclick="addCustomQuestion()">Add</button>
-                </div>
-            </div>
-
-            <button class="game-close-btn" onclick="closeGameModal()">Close Game</button>
-        </div>
-    </div>
-
     <div id="app-container">
         <div id="sidebar">
             <div class="sidebar-header"><span id="my-profile">ONE Messenger</span></div>
@@ -157,7 +126,7 @@
                     </div>
                 </div>
                 <div class="header-right-group">
-                    <button class="mini-game-btn" onclick="openGameModal()" title="Truth or Dare Game">🎯</button>
+                    <button class="mini-game-btn" id="game-toggle-btn" onclick="toggleGameMode()" title="Toggle Truth/Dare Mode">🎯</button>
                     <div class="call-btn-group" id="call-tools" style="display: none;">
                         <button class="call-btn" onclick="initiateCall(false)" title="Audio Call">📞</button>
                         <button class="call-btn" onclick="initiateCall(true)" title="Video Call">📹</button>
@@ -171,7 +140,15 @@
                 <button class="action-icon" onclick="document.getElementById('image-input').click()" title="Send Photo">📷</button>
                 <input type="file" id="image-input" accept="image/*" style="display: none;" onchange="sendImageMsg(event)">
                 <button class="action-icon" id="voice-btn" onclick="toggleVoiceRecord()" title="Voice Note">🎙️</button>
+                
                 <input type="text" id="message-input" placeholder="Type a love message..." oninput="sendTyping()" onkeypress="handleKey(event)">
+                
+                <!-- Truth & Dare buttons near input (Visible only when Game mode is ON) -->
+                <div class="game-mode-btns" id="game-mode-btns">
+                    <button class="btn-truth-mode" onclick="sendGameMessage('Truth')">Truth 💬</button>
+                    <button class="btn-dare-mode" onclick="sendGameMessage('Dare')">Dare 🔥</button>
+                </div>
+
                 <button class="send-btn" onclick="sendTextMsg()">➤</button>
             </div>
 
@@ -212,64 +189,45 @@
 
         let isMicMuted = false;
         let isCamOff = false;
+        let isGameModeActive = false; // Track game mode status
 
-        // Truth & Dare Question Pools (Custom add ho sakegi)
-        let truthQuestions = [
-            "Phli baar aapne mujhe kab notice kiya tha? 💕",
-            "Meri aisi konsi baat hai jo aapko sabse zyada pasand hai? 🥰",
-            "Apni life ka sabse romantic moment mere sath konsa lagta hai? ✨",
-            "Mujhe ek word mein describe karein! 💖"
-        ];
-
-        let dareQuestions = [
-            "Mujhe ek voice note mein apna favourite romantic gaana gaa kar sunao! 🎶",
-            "Apne phone ka last wallpaper mujhe screenshot bhej kar dikhao! 📱",
-            "Mujhe 3 aise reasons batao ki tum mujhse pyaar kyun karte ho? ❤️",
-            "Agli 5 minutes tak sirf emoji mein baat karoge! 🤐"
-        ];
-
-        function openGameModal() {
+        function toggleGameMode() {
             if (!currentChatUser) return alert('Pehle kisi contact ko select karein!');
-            document.getElementById('game-modal').style.display = 'flex';
-        }
-
-        function closeGameModal() {
-            document.getElementById('game-modal').style.display = 'none';
-        }
-
-        function addCustomQuestion() {
-            const input = document.getElementById('custom-q-input');
-            const val = input.value.trim();
-            if (!val) return alert('Kuch text toh likhiye!');
+            isGameModeActive = !isGameModeActive;
             
-            // Randomly push to truth or dare list
-            if (Math.random() > 0.5) {
-                truthQuestions.push(val);
-                alert('Aapka Truth question successfully add ho gaya!');
+            const btn = document.getElementById('game-toggle-btn');
+            const gameBtnsBox = document.getElementById('game-mode-btns');
+            const inputField = document.getElementById('message-input');
+
+            if (isGameModeActive) {
+                btn.classList.add('active-game');
+                gameBtnsBox.style.display = 'flex';
+                inputField.placeholder = 'Apna khud ka question yahan likho...';
             } else {
-                dareQuestions.push(val);
-                alert('Aapka Dare question successfully add ho gaya!');
+                btn.classList.remove('active-game');
+                gameBtnsBox.style.display = 'none';
+                inputField.placeholder = 'Type a love message...';
             }
-            input.value = '';
         }
 
-        function playGame(type) {
-            let selectedList = type === 'Truth' ? truthQuestions : dareQuestions;
-            const randomIndex = Math.floor(Math.random() * selectedList.length);
-            const questionText = selectedList[randomIndex];
+        function sendGameMessage(type) {
+            const input = document.getElementById('message-input');
+            const text = input.value.trim();
+            if (!text) return alert('Pehle input box mein apna question toh likhiye!');
+            if (!currentChatUser) return;
 
-            closeGameModal();
+            const finalMsgText = `🎯 [${type}] : ${text}`;
+            socket.emit('private_message', { 
+                sender: currentUser, 
+                receiver: currentChatUser, 
+                text: finalMsgText, 
+                type: 'text', 
+                time: getTimeStamp() 
+            });
 
-            if (currentChatUser) {
-                const finalMsg = `🎮 [Truth & Dare - ${type}] : ${questionText}`;
-                socket.emit('private_message', { 
-                    sender: currentUser, 
-                    receiver: currentChatUser, 
-                    text: finalMsg, 
-                    type: 'text', 
-                    time: getTimeStamp() 
-                });
-            }
+            input.value = '';
+            // Reset game mode after sending if desired, or keep it on. Let's turn off game mode back to normal.
+            toggleGameMode();
         }
 
         function login() {
@@ -366,6 +324,10 @@
             document.getElementById('chat-title').innerText = user;
             document.getElementById('call-tools').style.display = 'flex';
             document.body.classList.add('mobile-chat-open');
+            
+            // Reset game mode when changing chat
+            if (isGameModeActive) toggleGameMode();
+
             updateHeaderStatus();
             renderContacts();
 
@@ -376,6 +338,7 @@
 
         function closeMobileChat() {
             document.body.classList.remove('mobile-chat-open');
+            if (isGameModeActive) toggleGameMode();
         }
 
         function updateHeaderStatus() {
@@ -396,7 +359,15 @@
             sendTyping(false);
         }
 
-        function handleKey(e) { if (e.key === 'Enter') sendTextMsg(); }
+        function handleKey(e) { 
+            if (e.key === 'Enter') {
+                if (isGameModeActive) {
+                    // In game mode, Enter doesn't auto send text unless Truth or Dare button is clicked
+                    return;
+                }
+                sendTextMsg(); 
+            }
+        }
 
         function sendTyping(override) {
             if (!currentChatUser) return;
