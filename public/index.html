@@ -24,7 +24,7 @@
         
         /* Sidebar */
         #sidebar { width: 320px; background: #23192f; border-right: 1px solid #3d2a4f; display: flex; flex-direction: column; height: 100%; flex-shrink: 0; }
-        .sidebar-header { height: 60px; padding: 0 16px; background: #2a1b3a; color: #ff80ab; font-weight: bold; display: flex; align-items: center; font-size: 1.2rem; border-bottom: 1px solid #3d2a4f; }
+        .sidebar-header { height: 60px; padding: 0 16px; background: #2a1b3a; color: #ff80ab; font-weight: bold; display: flex; align-items: center; justify-content: space-between; font-size: 1.2rem; border-bottom: 1px solid #3d2a4f; }
         #contact-list { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
         .contact-item { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.03); cursor: pointer; display: flex; flex-direction: column; gap: 4px; transition: 0.2s; }
         .contact-item:active, .contact-item.active { background: #322142; color: #ff4081; }
@@ -33,7 +33,7 @@
         .contact-status.online { color: #ff4081; }
 
         /* Chat Area */
-        #chat-area { flex: 1; display: flex; flex-direction: column; height: 100%; background: #181020; position: relative; overflow: hidden; }
+        #chat-area { flex: 1; display: flex; flex-direction: column; height: 100%; background: #181020; position: relative; overflow: hidden; transition: background 0.3s; }
         
         .chat-header { height: 60px; padding: 0 16px; background: #23192f; border-bottom: 1px solid #3d2a4f; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; z-index: 100; }
         .header-left { display: flex; align-items: center; gap: 10px; }
@@ -41,18 +41,24 @@
         .user-title { font-weight: 600; font-size: 1.1rem; color: #f3e5f5; }
         .status { font-size: 0.75rem; color: #9c88b1; }
         
-        .call-btn-group { display: flex; gap: 12px; }
-        .call-btn { background: #2f1f3d; border: none; color: #ff80ab; width: 40px; height: 40px; border-radius: 50%; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .header-right-group { display: flex; align-items: center; gap: 10px; }
+        .call-btn-group { display: flex; gap: 8px; }
+        .call-btn { background: #2f1f3d; border: none; color: #ff80ab; width: 38px; height: 38px; border-radius: 50%; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .call-btn:hover { background: #ff4081; color: white; }
+        
+        /* Theme Toggle Button */
+        .theme-btn { background: #2f1f3d; border: none; color: #ff80ab; width: 38px; height: 38px; border-radius: 50%; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .theme-btn:hover { background: #ff4081; color: white; }
 
         /* Messages */
-        #message-container { flex: 1; padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; gap: 12px; background-color: #181020; }
-        .message { max-width: 75%; padding: 10px 14px; border-radius: 12px; font-size: 0.95rem; word-wrap: break-word; line-height: 1.4; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        #message-container { flex: 1; padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; gap: 12px; }
+        .message { max-width: 75%; padding: 10px 14px; border-radius: 12px; font-size: 0.95rem; word-wrap: break-word; line-height: 1.4; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.3); user-select: none; }
         .message.sent { background: linear-gradient(135deg, #c51162, #880e4f); align-self: flex-end; border-bottom-right-radius: 2px; color: #ffffff; }
         .message.received { background: #2a1b3a; align-self: flex-start; border-bottom-left-radius: 2px; color: #f3e5f5; }
         .message img { max-width: 100%; max-height: 280px; border-radius: 8px; margin-top: 4px; display: block; object-fit: cover; border: 2px solid #ff4081; }
         .message audio { max-width: 100%; margin-top: 4px; }
         .message .meta { font-size: 0.65rem; color: rgba(255,255,255,0.6); margin-top: 4px; text-align: right; }
+        .msg-reaction { position: absolute; bottom: -8px; right: 10px; background: #23192f; border: 1px solid #ff4081; border-radius: 10px; padding: 2px 6px; font-size: 0.75rem; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
 
         /* Input Bar */
         .chat-input-container { height: 65px; padding: 0 12px; background: #23192f; display: flex; gap: 8px; align-items: center; border-top: 1px solid #3d2a4f; flex-shrink: 0; z-index: 100; }
@@ -80,6 +86,11 @@
         .btn-call-opt.off { background: #fff; color: #000; }
         .btn-call-opt.hangup { background: #f44336; width: 68px; height: 68px; font-size: 1.6rem; }
 
+        /* Themes styles */
+        body.theme-midnight #chat-area { background: #0b0b14; }
+        body.theme-sunset #chat-area { background: linear-gradient(135deg, #2c163a, #4a1525); }
+        body.theme-rose #chat-area { background: #231018; }
+
         @media (max-width: 768px) {
             #sidebar { width: 100%; }
             #chat-area { display: none; }
@@ -89,7 +100,7 @@
         }
     </style>
 </head>
-<body>
+<body class="theme-rose">
 
     <div id="login-modal">
         <div class="login-box">
@@ -115,9 +126,12 @@
                         <div id="chat-subtitle" class="status"></div>
                     </div>
                 </div>
-                <div class="call-btn-group" id="call-tools" style="display: none;">
-                    <button class="call-btn" onclick="initiateCall(false)" title="Audio Call">📞</button>
-                    <button class="call-btn" onclick="initiateCall(true)" title="Video Call">📹</button>
+                <div class="header-right-group">
+                    <button class="theme-btn" onclick="toggleTheme()" title="Change Wallpaper Theme">🎨</button>
+                    <div class="call-btn-group" id="call-tools" style="display: none;">
+                        <button class="call-btn" onclick="initiateCall(false)" title="Audio Call">📞</button>
+                        <button class="call-btn" onclick="initiateCall(true)" title="Video Call">📹</button>
+                    </div>
                 </div>
             </div>
 
@@ -169,6 +183,14 @@
         let isMicMuted = false;
         let isCamOff = false;
 
+        // Theme Switcher Feature
+        const themes = ['theme-rose', 'theme-sunset', 'theme-midnight'];
+        let currentThemeIndex = 0;
+        function toggleTheme() {
+            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+            document.body.className = themes[currentThemeIndex];
+        }
+
         function login() {
             const name = document.getElementById('username-input').value.trim();
             const pass = document.getElementById('password-input').value.trim();
@@ -179,10 +201,8 @@
             document.getElementById('my-profile').innerText = 'ONE: ' + currentUser;
             document.getElementById('login-modal').style.display = 'none';
 
-            // Turant socket se register karein taaki contact list mein naam turant show ho jaye
             socket.emit('register_user', { username: currentUser, time: getTimeStamp() });
 
-            // PeerJS connection setup for Incognito/Normal support
             peer = new Peer(currentUser.toLowerCase().replace(/[^a-z0-9]/g, ''), {
                 host: window.location.hostname,
                 port: window.location.port || (window.location.protocol === 'https:' ? 443 : 80),
@@ -222,7 +242,7 @@
             });
         }
 
-                function getTimeStamp() {
+        function getTimeStamp() {
             const d = new Date();
             const options = {
                 timeZone: 'Asia/Kolkata',
@@ -232,7 +252,6 @@
             };
             return d.toLocaleTimeString('en-US', options);
         }
-
 
         socket.on('contacts_update', (data) => {
             contactsData = data;
@@ -375,7 +394,30 @@
             
             let content = msg.type === 'image' ? `<img src="${msg.mediaUrl}">` : (msg.type === 'audio' ? `<audio controls src="${msg.mediaUrl}"></audio>` : `<div>${msg.text}</div>`);
             let ticks = isSent ? (msg.status === 'read' ? ' <span style="color:#ff80ab;">✔✔</span>' : ' ✔') : '';
-            div.innerHTML = `${content}<div class="meta">${msg.time}${ticks}</div>`;
+            let reactionHtml = msg.reaction ? `<div class="msg-reaction">${msg.reaction}</div>` : '';
+            
+            div.innerHTML = `${content}${reactionHtml}<div class="meta">${msg.time}${ticks}</div>`;
+
+            // Double Tap to Love Feature (Feature 5)
+            let lastTap = 0;
+            div.onclick = (e) => {
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTap;
+                if (tapLength < 300 && tapLength > 0) {
+                    // Double tap detected!
+                    let reactionSpan = div.querySelector('.msg-reaction');
+                    if (!reactionSpan) {
+                        reactionSpan = document.createElement('div');
+                        reactionSpan.className = 'msg-reaction';
+                        reactionSpan.innerText = '❤️';
+                        div.appendChild(reactionSpan);
+                    } else {
+                        reactionSpan.innerText = reactionSpan.innerText === '❤️' ? '💖' : '❤️';
+                    }
+                }
+                lastTap = currentTime;
+            };
+
             container.appendChild(div);
             scrollBottom();
         }
