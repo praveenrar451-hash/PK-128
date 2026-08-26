@@ -33,7 +33,7 @@
         .contact-status.online { color: #ff4081; }
 
         /* Chat Area */
-        #chat-area { flex: 1; display: flex; flex-direction: column; height: 100%; background: #181020; position: relative; overflow: hidden; transition: background 0.3s; }
+        #chat-area { flex: 1; display: flex; flex-direction: column; height: 100%; background: #181020; position: relative; overflow: hidden; }
         
         .chat-header { height: 60px; padding: 0 16px; background: #23192f; border-bottom: 1px solid #3d2a4f; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; z-index: 100; }
         .header-left { display: flex; align-items: center; gap: 10px; }
@@ -43,8 +43,8 @@
         
         .header-right-group { display: flex; align-items: center; gap: 8px; }
         .call-btn-group { display: flex; gap: 6px; }
-        .call-btn, .mini-game-btn, .theme-btn { background: #2f1f3d; border: none; color: #ff80ab; width: 36px; height: 36px; border-radius: 50%; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .call-btn:hover, .mini-game-btn:hover, .theme-btn:hover { background: #ff4081; color: white; }
+        .call-btn, .mini-game-btn { background: #2f1f3d; border: none; color: #ff80ab; width: 36px; height: 36px; border-radius: 50%; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .call-btn:hover, .mini-game-btn:hover { background: #ff4081; color: white; }
 
         /* Messages */
         #message-container { flex: 1; padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; gap: 12px; }
@@ -56,14 +56,21 @@
         .message .meta { font-size: 0.65rem; color: rgba(255,255,255,0.6); margin-top: 4px; text-align: right; }
         .msg-reaction { position: absolute; bottom: -8px; right: 10px; background: #23192f; border: 1px solid #ff4081; border-radius: 10px; padding: 2px 6px; font-size: 0.75rem; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
 
-        /* Mini-Game Modal Popup */
-        #game-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 6000; display: none; justify-content: center; align-items: center; }
-        .game-card { background: #23192f; border: 2px solid #ff4081; padding: 25px; border-radius: 16px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        .game-card h3 { color: #ff4081; margin-bottom: 15px; }
-        .game-question { font-size: 1.1rem; margin-bottom: 20px; color: #fff; line-height: 1.4; }
-        .game-btns { display: flex; gap: 10px; justify-content: center; }
-        .game-btn { padding: 8px 16px; background: #ff4081; border: none; color: white; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .game-close { background: #3d2a4f; }
+        /* Interactive Truth & Dare Modal */
+        #game-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 6000; display: none; justify-content: center; align-items: center; }
+        .game-card { background: #23192f; border: 2px solid #ff4081; padding: 25px; border-radius: 16px; width: 90%; max-width: 340px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .game-card h3 { color: #ff4081; margin-bottom: 15px; font-size: 1.3rem; }
+        .game-desc { font-size: 0.9rem; color: #ff80ab; margin-bottom: 15px; }
+        .game-choice-btns { display: flex; gap: 12px; justify-content: center; margin-bottom: 20px; }
+        .choice-btn { flex: 1; padding: 12px; background: #3d2a4f; border: 1px solid #ff4081; color: white; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: 0.2s; }
+        .choice-btn:hover { background: #ff4081; }
+        
+        .custom-add-box { border-top: 1px solid #3d2a4f; padding-top: 15px; margin-top: 10px; text-align: left; }
+        .custom-add-box label { font-size: 0.8rem; color: #9c88b1; display: block; margin-bottom: 6px; }
+        .custom-input-row { display: flex; gap: 6px; }
+        .custom-input-row input { flex: 1; padding: 8px 10px; background: #1a1024; border: 1px solid #5d3a6e; color: #fff; border-radius: 6px; outline: none; font-size: 0.85rem; }
+        .custom-input-row button { padding: 8px 12px; background: #ff4081; border: none; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
+        .game-close-btn { margin-top: 15px; background: none; border: none; color: #9c88b1; cursor: pointer; font-size: 0.9rem; text-decoration: underline; }
 
         /* Input Bar */
         .chat-input-container { height: 65px; padding: 0 12px; background: #23192f; display: flex; gap: 8px; align-items: center; border-top: 1px solid #3d2a4f; flex-shrink: 0; z-index: 100; }
@@ -75,7 +82,7 @@
         .send-btn { width: 44px; height: 44px; background: #ff4081; border: none; color: #fff; border-radius: 50%; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: 0.2s; }
         .send-btn:hover { background: #e91e63; }
 
-        /* Calling Overlay (Romantic Style) */
+        /* Calling Overlay */
         #call-screen { position: fixed; inset: 0; background: radial-gradient(circle, #4a1525 0%, #1a0d18 100%); z-index: 9000; display: none; flex-direction: column; justify-content: space-between; align-items: center; padding: 50px 20px; }
         .call-profile { text-align: center; }
         .call-avatar { width: 100px; height: 100px; background: rgba(255,64,129,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 15px; color: #ff4081; border: 2px solid #ff4081; box-shadow: 0 0 20px rgba(255,64,129,0.4); }
@@ -91,11 +98,6 @@
         .btn-call-opt.off { background: #fff; color: #000; }
         .btn-call-opt.hangup { background: #f44336; width: 68px; height: 68px; font-size: 1.6rem; }
 
-        /* Themes styles */
-        body.theme-midnight #chat-area { background: #0b0b14; }
-        body.theme-sunset #chat-area { background: linear-gradient(135deg, #2c163a, #4a1525); }
-        body.theme-rose #chat-area { background: #231018; }
-
         @media (max-width: 768px) {
             #sidebar { width: 100%; }
             #chat-area { display: none; }
@@ -105,7 +107,7 @@
         }
     </style>
 </head>
-<body class="theme-rose">
+<body>
 
     <div id="login-modal">
         <div class="login-box">
@@ -116,15 +118,26 @@
         </div>
     </div>
 
-    <!-- Mini Game Modal -->
+    <!-- Interactive Truth & Dare Modal -->
     <div id="game-modal">
         <div class="game-card">
-            <h3>💌 Couple Truth or Dare</h3>
-            <div class="game-question" id="game-q-text">Tap below to get a romantic question!</div>
-            <div class="game-btns">
-                <button class="game-btn" onclick="nextGameQuestion()">New Question</button>
-                <button class="game-btn game-close" onclick="closeGameModal()">Close</button>
+            <h3>🎯 Truth or Dare Game</h3>
+            <div class="game-desc">Apni pasand chunein ya apna naya question add karein!</div>
+            
+            <div class="game-choice-btns">
+                <button class="choice-btn" onclick="playGame('Truth')">Truth 💬</button>
+                <button class="choice-btn" onclick="playGame('Dare')">Dare 🔥</button>
             </div>
+
+            <div class="custom-add-box">
+                <label>Apna khud ka question add karein:</label>
+                <div class="custom-input-row">
+                    <input type="text" id="custom-q-input" placeholder="Jaise: Tumhe kya pasand hai?">
+                    <button onclick="addCustomQuestion()">Add</button>
+                </div>
+            </div>
+
+            <button class="game-close-btn" onclick="closeGameModal()">Close Game</button>
         </div>
     </div>
 
@@ -144,8 +157,7 @@
                     </div>
                 </div>
                 <div class="header-right-group">
-                    <button class="mini-game-btn" onclick="openGameModal()" title="Couple Mini-Game">🎮</button>
-                    <button class="theme-btn" onclick="toggleTheme()" title="Change Wallpaper Theme">🎨</button>
+                    <button class="mini-game-btn" onclick="openGameModal()" title="Truth or Dare Game">🎯</button>
                     <div class="call-btn-group" id="call-tools" style="display: none;">
                         <button class="call-btn" onclick="initiateCall(false)" title="Audio Call">📞</button>
                         <button class="call-btn" onclick="initiateCall(true)" title="Video Call">📹</button>
@@ -201,45 +213,59 @@
         let isMicMuted = false;
         let isCamOff = false;
 
-        // Theme Switcher Feature
-        const themes = ['theme-rose', 'theme-sunset', 'theme-midnight'];
-        let currentThemeIndex = 0;
-        function toggleTheme() {
-            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
-            document.body.className = themes[currentThemeIndex];
-        }
-
-        // Couple Mini-Game (Truth or Dare questions)
-        const coupleQuestions = [
+        // Truth & Dare Question Pools (Custom add ho sakegi)
+        let truthQuestions = [
             "Phli baar aapne mujhe kab notice kiya tha? 💕",
-            "Agar hume abhi kahin long drive par jana ho, toh kahan chalenge? 🚗",
             "Meri aisi konsi baat hai jo aapko sabse zyada pasand hai? 🥰",
             "Apni life ka sabse romantic moment mere sath konsa lagta hai? ✨",
-            "Mujhe ek word mein describe karein! 💖",
-            "Agar hume ek din ke liye time travel karne mile, toh kahan jaenge? ⏳"
+            "Mujhe ek word mein describe karein! 💖"
+        ];
+
+        let dareQuestions = [
+            "Mujhe ek voice note mein apna favourite romantic gaana gaa kar sunao! 🎶",
+            "Apne phone ka last wallpaper mujhe screenshot bhej kar dikhao! 📱",
+            "Mujhe 3 aise reasons batao ki tum mujhse pyaar kyun karte ho? ❤️",
+            "Agli 5 minutes tak sirf emoji mein baat karoge! 🤐"
         ];
 
         function openGameModal() {
             if (!currentChatUser) return alert('Pehle kisi contact ko select karein!');
             document.getElementById('game-modal').style.display = 'flex';
-            nextGameQuestion();
         }
 
         function closeGameModal() {
             document.getElementById('game-modal').style.display = 'none';
         }
 
-        function nextGameQuestion() {
-            const randomIndex = Math.floor(Math.random() * coupleQuestions.length);
-            const question = coupleQuestions[randomIndex];
-            document.getElementById('game-q-text').innerText = question;
+        function addCustomQuestion() {
+            const input = document.getElementById('custom-q-input');
+            const val = input.value.trim();
+            if (!val) return alert('Kuch text toh likhiye!');
             
-            // Automatically send this question to chat as a cute message
+            // Randomly push to truth or dare list
+            if (Math.random() > 0.5) {
+                truthQuestions.push(val);
+                alert('Aapka Truth question successfully add ho gaya!');
+            } else {
+                dareQuestions.push(val);
+                alert('Aapka Dare question successfully add ho gaya!');
+            }
+            input.value = '';
+        }
+
+        function playGame(type) {
+            let selectedList = type === 'Truth' ? truthQuestions : dareQuestions;
+            const randomIndex = Math.floor(Math.random() * selectedList.length);
+            const questionText = selectedList[randomIndex];
+
+            closeGameModal();
+
             if (currentChatUser) {
+                const finalMsg = `🎮 [Truth & Dare - ${type}] : ${questionText}`;
                 socket.emit('private_message', { 
                     sender: currentUser, 
                     receiver: currentChatUser, 
-                    text: "🎮 Couple Game Question: " + question, 
+                    text: finalMsg, 
                     type: 'text', 
                     time: getTimeStamp() 
                 });
